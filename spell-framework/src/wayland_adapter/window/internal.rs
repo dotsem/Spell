@@ -60,7 +60,6 @@ impl SpellWin {
                 .pointer_state
                 .update_cursor(self.adapter.as_ref().unwrap().current_cursor.get(), qh);
 
-            let buffer = &self.buffer;
             if self.first_configure.get() || redraw_val {
                 // if self.first_configure {
                 self.first_configure.set(false);
@@ -87,11 +86,15 @@ impl SpellWin {
                 //     }
                 // }
                 // Request our next frame
-                self.layer.as_ref().unwrap().wl_surface().attach(
-                    Some(buffer.as_ref().unwrap().wl_buffer()),
-                    0,
-                    0,
-                );
+            }
+            if let Some(adapter) = self.adapter.as_ref() {
+                if let Some(buffer) = adapter.buffer.borrow().as_ref() {
+                    self.layer.as_ref().unwrap().wl_surface().attach(
+                        Some(buffer.wl_buffer()),
+                        0,
+                        0,
+                    );
+                }
             }
 
             self.layer.as_ref().unwrap().wl_surface().frame(
